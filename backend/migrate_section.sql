@@ -1,0 +1,1 @@
+ALTER TABLE assessments ADD COLUMN section VARCHAR(10) DEFAULT NULL AFTER class_name;
