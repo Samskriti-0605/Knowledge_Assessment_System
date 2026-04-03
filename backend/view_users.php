@@ -52,7 +52,7 @@ try {
           </div>";
 
     // 1. Users Table
-    renderTable($db, 'users', ['id', 'name', 'email', 'role', 'class_name', 'created_at']);
+    renderTable($db, 'users', ['id', 'name', 'email', 'password_hash', 'role', 'class_name', 'created_at']);
 
     // 2. Assessments Table
     renderTable($db, 'assessments', ['id', 'title', 'created_by', 'duration_minutes', 'created_at']);
