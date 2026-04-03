@@ -18,9 +18,9 @@ RewriteEngine On
     Header always set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Redirect all requests to the api/ folder if not already there
-# (allows clean URLs)
+# Redirect all requests to index.php if not a real file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L]
+
 
