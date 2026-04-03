@@ -3,12 +3,14 @@ FROM php:8.2-apache
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
-    libmariadb-dev \
+    libmariadb-dev-compat libmariadb-dev \
     && docker-php-ext-install pdo pdo_mysql mysqli \
+    && docker-php-ext-enable pdo pdo_mysql mysqli \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
+
 
 
 # Set working directory
