@@ -24,12 +24,12 @@ export const AuthProvider = ({ children }) => {
             console.log('Attempting login with:', { email, password });
             const response = await api.post('/auth.php?action=login', { email, password });
             console.log('Login response:', response.data);
-            if (response.data.user) {
+            if (response.data && response.data.user) {
                 setUser(response.data.user);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 return { success: true };
             }
-            return { success: false, message: 'Invalid response from server' };
+            return { success: false, message: response.data?.message || 'Invalid response from server' };
         } catch (error) {
             console.error('Login error:', error);
             if (error.response) {
