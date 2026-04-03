@@ -2,9 +2,10 @@
 FROM php:8.2-apache
 
 # Install required system packages and PHP extensions
-# The docker-php-ext-install command is provided by the official PHP images
+# We add libmariadb-dev to ensure the MySQL drivers compile correctly
 RUN apt-get update && apt-get install -y \
     libzip-dev \
+    libmariadb-dev \
     zip \
     unzip \
     && docker-php-ext-install pdo pdo_mysql mysqli zip

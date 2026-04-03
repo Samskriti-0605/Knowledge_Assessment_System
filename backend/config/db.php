@@ -1,5 +1,5 @@
 <?php
-// Function to handle CORS
+// Function to handle CORS - MUST BE CALLED IMMEDIATELY
 function handleCors() {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -10,6 +10,9 @@ function handleCors() {
         exit();
     }
 }
+
+// Call CORS handler immediately upon inclusion
+handleCors();
 
 class Database {
     private $host;
