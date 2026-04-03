@@ -1,11 +1,9 @@
 <?php
-// Root index.php to prevent "Forbidden" errors when visiting the root domain.
-header('Content-Type: application/json; charset=utf-8');
-
+header('Content-Type: application/json');
 echo json_encode([
-    "status" => "online",
-    "message" => "Knowledge Assessment System Backend (PHP) is running.",
+    "status" => "success",
+    "message" => "Knowledge Assessment System API is online.",
     "version" => "1.0.0",
-    "environment" => "production"
+    "timestamp" => date('Y-m-d H:i:s')
 ]);
 ?>
