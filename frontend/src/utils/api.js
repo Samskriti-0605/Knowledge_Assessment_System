@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-// Automatically detect the API URL or use the environment variable
-// If we are on Vercel, we default to the live Render backend
-const rawBaseURL = import.meta.env.VITE_API_URL || 
+// v1.1.0 - Smart URL Detection
+const rawBaseURL = (import.meta.env.VITE_API_URL || '').trim() || 
                   (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') 
                    ? 'https://knowledge-assessment-backend.onrender.com' 
                    : 'http://localhost:8000');
+
+console.log('API Base URL:', rawBaseURL);
 
 const baseURL = rawBaseURL.endsWith('/api') ? rawBaseURL : `${rawBaseURL.replace(/\/$/, '')}/api`;
 
