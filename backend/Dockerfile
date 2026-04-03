@@ -1,14 +1,17 @@
-# Use official PHP 8.2 with Apache
-FROM php:8.2-apache
+# Use a professional, pre-configured image that HAS all drivers pre-installed
+FROM webdevops/php-apache:8.2
 
-# Use the well-known PHP extension installer to ensure all dependencies are met
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# Set working directory
+WORKDIR /app
 
-RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions pdo_mysql mysqli gd zip intl
+# The default web root in this image is /app, but we can set it to /var/www/html if needed.
+# Let's stick to the /app default for this image.
+# Copy all backend files
+COPY . /app
 
-# Enable Apache modules
-RUN a2enmod rewrite headers
+# Fix permissions for the web server user
+RUN chown -R application:application /app
+
 
 
 
