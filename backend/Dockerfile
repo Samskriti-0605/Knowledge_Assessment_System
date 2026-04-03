@@ -1,14 +1,15 @@
 # Use official PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Install PDO MySQL extension
-RUN docker-php-ext-install pdo pdo_mysql
+# Install PDO MySQL and mysqli extensions
+RUN docker-php-ext-install pdo pdo_mysql mysqli
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Enable Apache modules
+RUN a2enmod rewrite headers
 
 # Set working directory
 WORKDIR /var/www/html
+
 
 # Copy all backend files
 COPY . .
