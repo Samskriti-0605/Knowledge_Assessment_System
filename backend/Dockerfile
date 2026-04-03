@@ -1,37 +1,30 @@
-# Use a professional, pre-configured image that HAS all drivers pre-installed
-FROM webdevops/php-apache:8.2
+# Use the official PHP 8.2 Apache image
+FROM php:8.2-apache
 
-# Set working directory
-WORKDIR /app
+# Install required system packages and PHP extensions
+# The docker-php-ext-install command is provided by the official PHP images
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install pdo pdo_mysql mysqli zip
 
-# The default web root in this image is /app, but we can set it to /var/www/html if needed.
-# Let's stick to the /app default for this image.
-# Copy all backend files
-COPY . /app
+# Enable Apache mod_rewrite required for our .htaccess router rules
+RUN a2enmod rewrite
 
-# Fix permissions for the web server user
-RUN chown -R application:application /app
-
-
-
-
-
-# Set working directory
+# Set the working directory
 WORKDIR /var/www/html
 
+# Copy all application files to the container
+COPY . /var/www/html/
 
-# Copy all backend files
-COPY . .
+# Update the default apache site configuration to allow .htaccess overrides
+ENV APACHE_DOCUMENT_ROOT /var/www/html
 
-# Set Apache to allow .htaccess overrides
-RUN echo '<Directory /var/www/html>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/override.conf \
-    && a2enconf override
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Fix permissions
+# Fix permissions so Apache can serve and modify files if needed
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
