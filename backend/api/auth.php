@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     if ($last_login != $today) {
                         // Check if last login was yesterday
-                        $yesterday = date('Y-m-d', strtotime('-1 day'));
+                        $yesterday = aadate('Y-m-d', strtotime('-1 day'));
                         
                         if ($last_login == $yesterday) {
                             $streak++;

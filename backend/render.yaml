@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: knowledge-assessment-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DB_HOST
+        sync: false   # Set this in the Render dashboard
+      - key: DB_NAME
+        sync: false   # Set this in the Render dashboard
+      - key: DB_USER
+        sync: false   # Set this in the Render dashboard
+      - key: DB_PASS
+        sync: false   # Set this in the Render dashboard (mark as secret)
