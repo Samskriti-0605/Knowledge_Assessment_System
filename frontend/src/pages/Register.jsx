@@ -31,7 +31,7 @@ const Register = () => {
         }
 
         try {
-            await api.post('/auth.php?action=register', userData);
+            await api.post('auth.php?action=register', userData);
             navigate('/login');
         } catch (error) {
             setError(error.response?.data?.message || 'Registration failed');

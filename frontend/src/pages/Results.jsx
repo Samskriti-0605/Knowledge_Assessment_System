@@ -9,7 +9,7 @@ const Results = () => {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                const response = await api.get(`/submissions.php?assessment_id=${id}`);
+                const response = await api.get(`submissions.php?assessment_id=${id}`);
                 setSubmissions(response.data);
             } catch (error) {
                 console.error('Error fetching results', error);

@@ -1,5 +1,5 @@
 <?php
-// Function to handle CORS
+// Function to handle CORS - MUST BE CALLED IMMEDIATELY
 function handleCors() {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -11,12 +11,22 @@ function handleCors() {
     }
 }
 
+// Call CORS handler immediately upon inclusion
+handleCors();
+
 class Database {
-    private $host = "127.0.0.1";
-    private $db_name = "knowledge_assessment";
-    private $username = "root";
-    private $password = "SAMskriti@0605";
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct() {
+        $this->host     = getenv('DB_HOST') ?: '127.0.0.1';
+        $this->db_name  = getenv('DB_NAME') ?: 'knowledge_assessment';
+        $this->username = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASS') ?: 'SAMskriti@0605';
+    }
 
     public function getConnection() {
         $this->conn = null;

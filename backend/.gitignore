@@ -1,0 +1,21 @@
+# Environment secrets - NEVER commit these
+.env
+.env.local
+.env.production
+
+# Dependency caches
+vendor/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Adminer (don't expose in production)
+adminer.php

@@ -22,14 +22,14 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             console.log('Attempting login with:', { email, password });
-            const response = await api.post('/auth.php?action=login', { email, password });
+            const response = await api.post('auth.php?action=login', { email, password });
             console.log('Login response:', response.data);
-            if (response.data.user) {
+            if (response.data && response.data.user) {
                 setUser(response.data.user);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 return { success: true };
             }
-            return { success: false, message: 'Invalid response from server' };
+            return { success: false, message: response.data?.message || 'Invalid response from server' };
         } catch (error) {
             console.error('Login error:', error);
             if (error.response) {
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (name, email, password, role) => {
         try {
-            await api.post('/auth.php?action=register', { name, email, password, role });
+            await api.post('auth.php?action=register', { name, email, password, role });
             return { success: true };
         } catch (error) {
             return { success: false, message: error.response?.data?.message || 'Registration failed' };

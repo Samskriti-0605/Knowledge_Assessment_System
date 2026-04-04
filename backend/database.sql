@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS assessments (
     description TEXT,
     created_by INT NOT NULL,
     duration_minutes INT NOT NULL DEFAULT 30,
+    class_name VARCHAR(50) DEFAULT NULL,
+    section VARCHAR(10) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );

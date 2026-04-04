@@ -13,7 +13,7 @@ const StudentProgress = () => {
         setLoading(true);
 
         try {
-            const response = await api.get(`/student_progress.php?roll_number=${rollNumber}`);
+            const response = await api.get(`student_progress.php?roll_number=${rollNumber}`);
             setStudentData(response.data);
         } catch (err) {
             setError(err.response?.data?.message || 'Student not found');

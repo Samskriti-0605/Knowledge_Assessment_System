@@ -16,20 +16,20 @@ const TestPlayer = () => {
         const fetchData = async () => {
             try {
                 // Check if already taken
-                const resultRes = await api.get(`/submissions.php?user_id=${user.id}&assessment_id=${id}`);
+                const resultRes = await api.get(`submissions.php?user_id=${user.id}&assessment_id=${id}`);
                 if (resultRes.data.length > 0) {
                     alert('You have already completed this assessment.');
                     navigate('/student-dashboard');
                     return;
                 }
 
-                const assessRes = await api.get(`/assessments.php?id=${id}`);
+                const assessRes = await api.get(`assessments.php?id=${id}`);
                 setAssessment(assessRes.data);
                 if (assessRes.data.duration_minutes) {
                     setTimeLeft(assessRes.data.duration_minutes * 60);
                 }
 
-                const qRes = await api.get(`/questions.php?assessment_id=${id}`);
+                const qRes = await api.get(`questions.php?assessment_id=${id}`);
                 setQuestions(qRes.data);
             } catch (error) {
                 console.error('Error loading test', error);
@@ -59,7 +59,7 @@ const TestPlayer = () => {
         }));
 
         try {
-            await api.post('/submissions.php', {
+            await api.post('submissions.php', {
                 user_id: user.id,
                 assessment_id: id,
                 answers: formattedAnswers

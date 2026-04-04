@@ -15,7 +15,7 @@ const StudentAssessments = () => {
 
     const fetchAssessments = async () => {
         try {
-            const response = await api.get(`/assessments.php?class_name=${user.class_name}&section=${user.section}`);
+            const response = await api.get(`assessments.php?class_name=${user.class_name}&section=${user.section}`);
             setAssessments(response.data);
         } catch (error) {
             console.error('Error fetching assessments', error);
@@ -24,7 +24,7 @@ const StudentAssessments = () => {
 
     const fetchResults = async () => {
         try {
-            const response = await api.get(`/submissions.php?user_id=${user.id}`);
+            const response = await api.get(`submissions.php?user_id=${user.id}`);
             setResults(response.data);
         } catch (error) {
             console.error('Error fetching results', error);
