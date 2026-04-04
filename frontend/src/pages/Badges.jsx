@@ -12,7 +12,7 @@ const Badges = () => {
 
     const fetchResults = async () => {
         try {
-            const response = await api.get(`/submissions.php?user_id=${user.id}`);
+            const response = await api.get(`submissions.php?user_id=${user.id}`);
             setResults(response.data);
         } catch (error) {
             console.error('Error fetching results', error);

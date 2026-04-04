@@ -17,7 +17,7 @@ const Home = () => {
 
     const fetchLeaderboard = async () => {
         try {
-            const response = await api.get(`/submissions.php?leaderboard=true&class_name=${user.class_name}&section=${user.section}`);
+            const response = await api.get(`submissions.php?leaderboard=true&class_name=${user.class_name}&section=${user.section}`);
             setLeaderboard(response.data);
         } catch (error) {
             console.error('Error fetching leaderboard', error);
@@ -26,7 +26,7 @@ const Home = () => {
 
     const fetchClassmates = async () => {
         try {
-            const response = await api.get(`/users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
+            const response = await api.get(`users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
             // Sort by roll number if available, else by name
             const sorted = (response.data || []).sort((a, b) => {
                 if (a.roll_number && b.roll_number) {

@@ -15,7 +15,7 @@ const TeacherDashboard = () => {
 
     const fetchAssessments = async () => {
         try {
-            const response = await api.get(`/assessments.php?teacher_id=${user.id}`);
+            const response = await api.get(`assessments.php?teacher_id=${user.id}`);
             setAssessments(response.data);
         } catch (error) {
             console.error('Error fetching assessments', error);
@@ -24,7 +24,7 @@ const TeacherDashboard = () => {
 
     const fetchStudents = async () => {
         try {
-            const response = await api.get(`/users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
+            const response = await api.get(`users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
             setStudents(response.data);
         } catch (error) {
             console.error('Error fetching students', error);
@@ -40,7 +40,7 @@ const TeacherDashboard = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this assessment?')) {
             try {
-                await api.delete(`/assessments.php?id=${id}`);
+                await api.delete(`assessments.php?id=${id}`);
                 fetchAssessments();
             } catch (error) {
                 console.error('Error deleting assessment', error);

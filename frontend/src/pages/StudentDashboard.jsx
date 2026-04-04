@@ -17,7 +17,7 @@ const StudentDashboard = () => {
 
     const fetchAssessments = async () => {
         try {
-            const response = await api.get(`/assessments.php?class_name=${user.class_name}&section=${user.section}`);
+            const response = await api.get(`assessments.php?class_name=${user.class_name}&section=${user.section}`);
             setAssessments(response.data);
         } catch (error) {
             console.error('Error fetching assessments', error);
@@ -26,7 +26,7 @@ const StudentDashboard = () => {
 
     const fetchResults = async () => {
         try {
-            const response = await api.get(`/submissions.php?user_id=${user.id}`);
+            const response = await api.get(`submissions.php?user_id=${user.id}`);
             setResults(response.data);
         } catch (error) {
             console.error('Error fetching results', error);
@@ -35,7 +35,7 @@ const StudentDashboard = () => {
 
     const fetchClassmates = async () => {
         try {
-            const response = await api.get(`/users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
+            const response = await api.get(`users.php?class_name=${user.class_name}&section=${user.section}&role=student`);
             // Filter out the current user
             setClassmates(response.data.filter(c => c.id !== user.id));
         } catch (error) {

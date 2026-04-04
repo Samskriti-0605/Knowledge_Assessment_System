@@ -27,7 +27,7 @@ const TestBuilder = () => {
     const handleCreateAssessment = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.post('/assessments.php', {
+            const response = await api.post('assessments.php', {
                 title,
                 description,
                 created_by: user.id,
@@ -47,7 +47,7 @@ const TestBuilder = () => {
     const handleAddQuestion = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/questions.php', {
+            await api.post('questions.php', {
                 assessment_id: assessmentId,
                 question_text: questionText,
                 option_a: optionA,

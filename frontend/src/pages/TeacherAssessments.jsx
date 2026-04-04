@@ -13,7 +13,7 @@ const TeacherAssessments = () => {
 
     const fetchAssessments = async () => {
         try {
-            const response = await api.get(`/assessments.php?teacher_id=${user.id}`);
+            const response = await api.get(`assessments.php?teacher_id=${user.id}`);
             setAssessments(response.data);
         } catch (error) {
             console.error('Error fetching assessments', error);
@@ -23,7 +23,7 @@ const TeacherAssessments = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this assessment?')) {
             try {
-                await api.delete(`/assessments.php?id=${id}`);
+                await api.delete(`assessments.php?id=${id}`);
                 fetchAssessments();
             } catch (error) {
                 console.error('Error deleting assessment', error);
