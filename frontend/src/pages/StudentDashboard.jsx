@@ -164,7 +164,14 @@ const StudentDashboard = () => {
                     {results.slice().reverse().slice(0, 5).map((result, idx) => {
                         const percentage = (result.score / result.total_marks) * 100;
                         const barHeight = Math.max(percentage, 5);
+                        
                         let performanceLabel = 'LOW';
+                        let barColor = 'var(--secondary)'; // Defaults to secondary red-ish color
+                        
+                        if (percentage >= 90) { performanceLabel = 'EXCEL'; barColor = '#4CAF50'; }
+                        else if (percentage >= 75) { performanceLabel = 'GOOD'; barColor = '#2196F3'; }
+                        else if (percentage >= 50) { performanceLabel = 'AVG'; barColor = '#FF9800'; }
+                        else { performanceLabel = 'POOR'; barColor = '#F44336'; }
 
                         return (
                             <div key={idx} style={{
@@ -178,11 +185,12 @@ const StudentDashboard = () => {
                                 <div style={{
                                     width: '60%',
                                     height: `${barHeight}%`,
-                                    backgroundColor: 'var(--text-muted)',
-                                    borderRadius: '0.1rem',
+                                    backgroundColor: barColor,
+                                    borderRadius: '0.15rem',
                                     position: 'relative',
                                     display: 'flex',
-                                    justifyContent: 'center'
+                                    justifyContent: 'center',
+                                    transition: 'height 0.5s ease-in-out'
                                 }}>
                                     <div style={{
                                         position: 'absolute',
@@ -192,12 +200,17 @@ const StudentDashboard = () => {
                                         alignItems: 'center',
                                         width: 'max-content'
                                     }}>
-                                        <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-main)' }}>{performanceLabel}</span>
+                                        <span style={{ fontSize: '0.65rem', fontWeight: '700', color: barColor }}>{performanceLabel}</span>
                                         <span style={{ fontSize: '0.65rem', fontWeight: '500', color: 'var(--text-muted)' }}>{Math.round(percentage)}%</span>
                                     </div>
                                 </div>
-                                <span style={{ fontSize: '0.65rem', marginTop: '0.75rem', fontWeight: '500', color: 'var(--text-muted)' }}>
-                                    Test {results.length - idx}
+                                <span 
+                                    style={{ fontSize: '0.65rem', marginTop: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '65px' }}
+                                    title={result.assessment_title || `Test ${results.length - idx}`}
+                                >
+                                    {result.assessment_title ? 
+                                        (result.assessment_title.length > 8 ? result.assessment_title.substring(0, 8) + '...' : result.assessment_title) 
+                                        : `Test ${results.length - idx}`}
                                 </span>
                             </div>
                         );
