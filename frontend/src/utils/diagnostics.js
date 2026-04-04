@@ -1,10 +1,16 @@
 // Ensure the diagnostics hit the correct /api path
-const rawAPI_URL = import.meta.env.VITE_API_URL || 
-                  (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') 
-                   ? 'https://knowledge-assessment-backend.onrender.com' 
-                   : 'http://localhost:8000');
+const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+let API_URL = isVercel 
+    ? 'https://knowledge-assessment-backend.onrender.com/api' 
+    : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').trim();
 
-const API_URL = rawAPI_URL.endsWith('/api') ? rawAPI_URL : `${rawAPI_URL.replace(/\/$/, '')}/api`;
+// Sanitize just in case
+if (API_URL.includes('https://') && API_URL.lastIndexOf('https://') > 0) {
+    API_URL = API_URL.substring(API_URL.lastIndexOf('https://'));
+}
+if (!API_URL.endsWith('/api')) {
+    API_URL = `${API_URL.replace(/\/$/, '')}/api`;
+}
 
 
 const runDiagnostics = async () => {

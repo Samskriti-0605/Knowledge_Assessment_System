@@ -1,14 +1,20 @@
 import axios from 'axios';
 
-// v1.1.0 - Smart URL Detection
-const rawBaseURL = (import.meta.env.VITE_API_URL || '').trim() || 
-                  (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') 
-                   ? 'https://knowledge-assessment-backend.onrender.com' 
-                   : 'http://localhost:8000');
+const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+const rawBaseURL = isVercel 
+    ? 'https://knowledge-assessment-backend.onrender.com/api' 
+    : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').trim();
 
-console.log('API Base URL:', rawBaseURL);
+// Clean up just in case
+let baseURL = rawBaseURL;
+if (baseURL.includes('https://') && baseURL.lastIndexOf('https://') > 0) {
+    baseURL = baseURL.substring(baseURL.lastIndexOf('https://'));
+}
+if (!baseURL.endsWith('/api')) {
+    baseURL = `${baseURL.replace(/\/$/, '')}/api`;
+}
 
-const baseURL = rawBaseURL.endsWith('/api') ? rawBaseURL : `${rawBaseURL.replace(/\/$/, '')}/api`;
+console.log('API Base URL:', baseURL);
 
 const api = axios.create({
     baseURL: baseURL,
