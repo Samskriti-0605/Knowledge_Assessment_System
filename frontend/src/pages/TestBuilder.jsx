@@ -40,7 +40,8 @@ const TestBuilder = () => {
                 setStep(2);
             }
         } catch (error) {
-            alert('Error creating assessment');
+            console.error('Create assessment failed:', error);
+            alert('Error creating assessment: ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -72,7 +73,8 @@ const TestBuilder = () => {
 
             alert('Question added!');
         } catch (error) {
-            alert('Error adding question');
+            console.error('Add question failed:', error);
+            alert('Error adding question: ' + (error.response?.data?.message || error.message));
         }
     };
 
