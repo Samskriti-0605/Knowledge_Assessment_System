@@ -61,7 +61,7 @@ const StudentProgress = () => {
             </div>
 
             {studentData && (
-                <>
+                <div className="printable-report">
                     {/* Student Info Card */}
                     <div className="card mb-4 report-container">
                         <div className="report-header" style={{ display: 'none' }}>
@@ -144,7 +144,7 @@ const StudentProgress = () => {
                                                     <td>{submission.score}</td>
                                                     <td>{submission.total_marks}</td>
                                                     <td>
-                                                        <span style={{
+                                                        <span className="percentage-badge" style={{
                                                             padding: '0.25rem 0.75rem',
                                                             borderRadius: '0.25rem',
                                                             background: percentage >= 60 ? 'var(--primary)' : 'var(--secondary)',
@@ -181,24 +181,107 @@ const StudentProgress = () => {
 
                     <style>{`
                         @media print {
-                            body * { visibility: hidden; }
-                            .report-container, .report-container *, 
-                            .grid.mb-4, .grid.mb-4 *,
-                            .card:last-of-type, .card:last-of-type * { visibility: visible; }
-                            
-                            .report-container { position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; }
-                            .grid.mb-4 { position: absolute; left: 0; top: 220px; width: 100%; display: grid !important; }
-                            .card:last-of-type { position: absolute; left: 0; top: 380px; width: 100%; border: none !important; box-shadow: none !important; }
-                            
-                            .hide-on-print, .btn, form, h2 { display: none !important; }
-                            .report-header, .report-footer { display: block !important; }
-                            
-                            .table { width: 100% !important; border: 1px solid #eee !important; }
-                            .table th { background: #f8f9fa !important; color: #000 !important; }
-                            span { color: #000 !important; background: transparent !important; }
+                            /* Set up the page */
+                            @page {
+                                size: A4;
+                                margin: 20mm;
+                            }
+
+                            /* Hide EVERYTHING first */
+                            html, body, #root, .container {
+                                background: white !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                            }
+
+                            body * {
+                                visibility: hidden !important;
+                                position: static !important;
+                            }
+
+                            /* Show ONLY our specific report container */
+                            .printable-report, .printable-report * {
+                                visibility: visible !important;
+                            }
+
+                            .printable-report {
+                                position: absolute !important;
+                                left: 0 !important;
+                                top: 0 !important;
+                                width: 100% !important;
+                                display: block !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                            }
+
+                            /* Hide non-print UI inside the report */
+                            .hide-on-print, button, form, .input {
+                                display: none !important;
+                            }
+
+                            /* Clean up layout for print */
+                            .card {
+                                border: 1px solid #eee !important;
+                                box-shadow: none !important;
+                                margin-bottom: 2rem !important;
+                                padding: 2rem !important;
+                                page-break-inside: avoid !important;
+                                background: white !important;
+                            }
+
+                            .grid {
+                                display: flex !important;
+                                flex-wrap: wrap !important;
+                                gap: 2rem !important;
+                            }
+
+                            .grid > div {
+                                flex: 1 1 200px !important;
+                            }
+
+                            /* Ensure headers and footers are visible */
+                            .report-header, .report-footer {
+                                display: block !important;
+                                width: 100% !important;
+                            }
+
+                            .report-header h1 {
+                                font-size: 24pt !important;
+                                margin-bottom: 10pt !important;
+                            }
+
+                            /* Table styling */
+                            .table-responsive {
+                                overflow: visible !important;
+                            }
+                            .table {
+                                width: 100% !important;
+                                border-collapse: collapse !important;
+                            }
+                            .table th, .table td {
+                                border: 1px solid #ddd !important;
+                                padding: 12px !important;
+                                text-align: left !important;
+                                font-size: 10pt !important;
+                            }
+                            .table th {
+                                background-color: #f8f8f8 !important;
+                                -webkit-print-color-adjust: exact;
+                            }
+
+                            /* Badges/Percentages colors */
+                            .percentage-badge {
+                                -webkit-print-color-adjust: exact !important;
+                                color-adjust: exact !important;
+                                border: 1px solid #ccc !important;
+                                color: black !important;
+                                background: transparent !important;
+                            }
+
+                            h2, .mb-4:not(.printable-report *) { display: none !important; }
                         }
                     `}</style>
-                </>
+                </div>
             )}
         </div>
     );
