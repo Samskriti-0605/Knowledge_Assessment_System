@@ -48,7 +48,7 @@ const Home = () => {
                 <h1 style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--text-main)', marginBottom: '0.5rem', letterSpacing: '-0.05em' }}>
                     Welcome back, {user.name.split(' ')[0]}!
                 </h1>
-                <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>Here is your class overview for today.</p>
+                <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>{user.role === 'teacher' ? 'Here is your students overview for today.' : 'Here is your class overview for today.'}</p>
             </div>
 
             {/* Leaderboard Section */}
@@ -110,7 +110,7 @@ const Home = () => {
 
             <div className="card" style={{ borderRadius: '1rem', padding: '2rem' }}>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)' }}>
-                    👥 Your Classmates
+                    👥 {user.role === 'teacher' ? 'Your Students' : 'Your Classmates'}
                 </h3>
 
                 <div className="table-responsive">

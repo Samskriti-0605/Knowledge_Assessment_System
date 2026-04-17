@@ -23,7 +23,7 @@ const Badges = () => {
         ? Math.round((results.reduce((sum, r) => sum + (r.score / r.total_marks * 100), 0) / results.length))
         : 0;
 
-    const allBadges = [
+    const milestoneBadges = [
         { name: 'First Steps', emoji: '🎯', color: '#808000', requirement: 'Complete 1 test', unlocked: results.length >= 1 },
         { name: 'Dedicated', emoji: '🔥', color: '#808000', requirement: 'Complete 3 tests', unlocked: results.length >= 3 },
         { name: 'Committed', emoji: '⭐', color: '#808000', requirement: 'Complete 5 tests', unlocked: results.length >= 5 },
@@ -33,6 +33,16 @@ const Badges = () => {
         { name: 'Perfect Score', emoji: '🌟', color: '#808000', requirement: 'Score 100% on any test', unlocked: results.some(r => (r.score / r.total_marks) * 100 === 100) },
     ];
 
+    // Dynamic badges for EACH test completed
+    const testBadges = results.map((res, index) => ({
+        name: `${res.assessment_title} Finisher`,
+        emoji: '📝',
+        color: '#6366f1',
+        requirement: `Completed on ${new Date(res.submitted_at).toLocaleDateString()}`,
+        unlocked: true
+    }));
+
+    const allBadges = [...milestoneBadges, ...testBadges];
     const unlockedBadges = allBadges.filter(b => b.unlocked);
     const lockedBadges = allBadges.filter(b => !b.unlocked);
 
