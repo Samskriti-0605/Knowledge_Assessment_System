@@ -37,6 +37,34 @@ const StudentProgress = () => {
         fetchProgress(rollNumber);
     };
 
+    const handleDownloadCSV = () => {
+        if (!studentData || !studentData.submissions) return;
+
+        const headers = ["Assessment", "Score", "Total Marks", "Percentage", "Date"];
+        const rows = studentData.submissions.map(sub => [
+            sub.assessment_title,
+            sub.score,
+            sub.total_marks,
+            ((sub.score / sub.total_marks) * 100).toFixed(2) + "%",
+            new Date(sub.submitted_at).toLocaleDateString()
+        ]);
+
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Report_${studentData.student.roll_number}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="container">
             <h2 className="mb-4">Student Progress Tracker</h2>
@@ -73,13 +101,22 @@ const StudentProgress = () => {
 
                         <div className="flex justify-between items-center mb-4 hide-on-print">
                             <h3 style={{ margin: 0 }}>Student Information</h3>
-                            <button 
-                                onClick={() => window.print()} 
-                                className="btn btn-outline"
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                            >
-                                📥 Download PDF Report
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button 
+                                    onClick={handleDownloadCSV} 
+                                    className="btn btn-outline"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}
+                                >
+                                    📊 Download CSV
+                                </button>
+                                <button 
+                                    onClick={() => window.print()} 
+                                    className="btn btn-outline"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                >
+                                    📥 Download PDF Report
+                                </button>
+                            </div>
                         </div>
                         
                         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
