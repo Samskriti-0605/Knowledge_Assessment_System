@@ -23,28 +23,27 @@ const Badges = () => {
         ? Math.round((results.reduce((sum, r) => sum + (r.score / r.total_marks * 100), 0) / results.length))
         : 0;
 
+    const totalPoints = results.reduce((sum, r) => sum + parseInt(r.score), 0);
+
     const milestoneBadges = [
         { name: 'First Steps', emoji: '🎯', color: '#808000', requirement: 'Complete 1 test', unlocked: results.length >= 1 },
         { name: 'Dedicated', emoji: '🔥', color: '#808000', requirement: 'Complete 3 tests', unlocked: results.length >= 3 },
         { name: 'Committed', emoji: '⭐', color: '#808000', requirement: 'Complete 5 tests', unlocked: results.length >= 5 },
         { name: 'Unstoppable', emoji: '💪', color: '#808000', requirement: 'Complete 10 tests', unlocked: results.length >= 10 },
+        { name: 'Veteran', emoji: '🏅', color: '#808000', requirement: 'Complete 15 tests', unlocked: results.length >= 15 },
+        { name: 'Bronze Streak', emoji: '⚡', color: '#808000', requirement: '3 Day Login Streak', unlocked: user.streak_count >= 3 },
+        { name: 'Gold Streak', emoji: '👑', color: '#808000', requirement: '7 Day Login Streak', unlocked: user.streak_count >= 7 },
+        { name: 'Point Master', emoji: '💰', color: '#808000', requirement: 'Reach 200 Total Points', unlocked: totalPoints >= 200 },
         { name: 'High Achiever', emoji: '🏆', color: '#808000', requirement: 'Average 80%+ score', unlocked: avgScore >= 80 },
         { name: 'Excellence', emoji: '💎', color: '#808000', requirement: 'Average 95%+ score', unlocked: avgScore >= 95 },
         { name: 'Perfect Score', emoji: '🌟', color: '#808000', requirement: 'Score 100% on any test', unlocked: results.some(r => (r.score / r.total_marks) * 100 === 100) },
     ];
 
-    // Dynamic badges for EACH test completed
-    const testBadges = results.map((res, index) => ({
-        name: `${res.assessment_title} Finisher`,
-        emoji: '📝',
-        color: '#6366f1',
-        requirement: `Completed on ${new Date(res.submitted_at).toLocaleDateString()}`,
-        unlocked: true
-    }));
+    const allBadges = milestoneBadges;
 
-    const allBadges = [...milestoneBadges, ...testBadges];
     const unlockedBadges = allBadges.filter(b => b.unlocked);
-    const lockedBadges = allBadges.filter(b => !b.unlocked);
+    // Only show the SINGLE NEXT locked badge to unlock it one by one
+    const lockedBadges = allBadges.filter(b => !b.unlocked).slice(0, 1);
 
     return (
         <div className="container">

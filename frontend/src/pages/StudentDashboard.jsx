@@ -168,10 +168,9 @@ const StudentDashboard = () => {
                         let performanceLabel = 'LOW';
                         let barColor = 'var(--secondary)'; // Defaults to secondary red-ish color
                         
-                        if (percentage >= 90) { performanceLabel = 'EXCEL'; barColor = '#4CAF50'; }
-                        else if (percentage >= 75) { performanceLabel = 'GOOD'; barColor = '#2196F3'; }
-                        else if (percentage >= 50) { performanceLabel = 'AVG'; barColor = '#FF9800'; }
-                        else { performanceLabel = 'POOR'; barColor = '#F44336'; }
+                        if (percentage >= 50) { performanceLabel = 'PASS'; barColor = '#808000'; } // Olive Green
+                        else { performanceLabel = 'FAIL'; barColor = '#94a3b8'; } // Grey
+
 
                         return (
                             <div key={idx} style={{

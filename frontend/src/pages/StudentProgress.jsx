@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 
 const StudentProgress = () => {
@@ -6,14 +7,22 @@ const StudentProgress = () => {
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [searchParams] = useSearchParams();
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        const roll = searchParams.get('roll');
+        if (roll) {
+            setRollNumber(roll);
+            fetchProgress(roll);
+        }
+    }, [searchParams]);
+
+    const fetchProgress = async (rollToSearch) => {
         setError('');
         setLoading(true);
 
         try {
-            const response = await api.get(`student_progress.php?roll_number=${rollNumber}`);
+            const response = await api.get(`student_progress.php?roll_number=${rollToSearch}`);
             setStudentData(response.data);
         } catch (err) {
             setError(err.response?.data?.message || 'Student not found');
@@ -21,6 +30,11 @@ const StudentProgress = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        fetchProgress(rollNumber);
     };
 
     return (
@@ -49,8 +63,25 @@ const StudentProgress = () => {
             {studentData && (
                 <>
                     {/* Student Info Card */}
-                    <div className="card mb-4">
-                        <h3 className="mb-4">Student Information</h3>
+                    <div className="card mb-4 report-container">
+                        <div className="report-header" style={{ display: 'none' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '2rem', borderBottom: '2px solid var(--primary)', paddingBottom: '1rem' }}>
+                                <h1 style={{ color: 'var(--primary)', margin: 0 }}>OFFICIAL PROGRESS REPORT</h1>
+                                <p style={{ margin: '5px 0', fontWeight: '600' }}>Knowledge Assessment System</p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-4 hide-on-print">
+                            <h3 style={{ margin: 0 }}>Student Information</h3>
+                            <button 
+                                onClick={() => window.print()} 
+                                className="btn btn-outline"
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                                📥 Download PDF Report
+                            </button>
+                        </div>
+                        
                         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                             <div>
                                 <p className="text-muted" style={{ marginBottom: '0.5rem' }}>Name</p>
@@ -131,7 +162,42 @@ const StudentProgress = () => {
                                 </table>
                             </div>
                         )}
+                        
+                        {/* Report Footer */}
+                        <div className="report-footer" style={{ display: 'none', marginTop: '5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                <div style={{ borderTop: '1px solid #000', width: '200px', textAlign: 'center', paddingTop: '0.5rem' }}>
+                                    Student Signature
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>Generated on {new Date().toLocaleDateString()}</p>
+                                </div>
+                                <div style={{ borderTop: '1px solid #000', width: '200px', textAlign: 'center', paddingTop: '0.5rem' }}>
+                                    Authorized Signature
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <style>{`
+                        @media print {
+                            body * { visibility: hidden; }
+                            .report-container, .report-container *, 
+                            .grid.mb-4, .grid.mb-4 *,
+                            .card:last-of-type, .card:last-of-type * { visibility: visible; }
+                            
+                            .report-container { position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; }
+                            .grid.mb-4 { position: absolute; left: 0; top: 220px; width: 100%; display: grid !important; }
+                            .card:last-of-type { position: absolute; left: 0; top: 380px; width: 100%; border: none !important; box-shadow: none !important; }
+                            
+                            .hide-on-print, .btn, form, h2 { display: none !important; }
+                            .report-header, .report-footer { display: block !important; }
+                            
+                            .table { width: 100% !important; border: 1px solid #eee !important; }
+                            .table th { background: #f8f9fa !important; color: #000 !important; }
+                            span { color: #000 !important; background: transparent !important; }
+                        }
+                    `}</style>
                 </>
             )}
         </div>
