@@ -1,19 +1,8 @@
 Options -Indexes
 RewriteEngine On
 
-# Ensure mod_headers is available for CORS and security
+# Security headers
 <IfModule mod_headers.c>
-    # Handle CORS preflight requests
-    SetEnvIf Request_Method "OPTIONS" IS_OPTIONS
-    Header always set Access-Control-Allow-Origin "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-    
-    # Send a 200 OK for OPTIONS instead of redirecting or executing PHP
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ $1 [R=200,L]
-
-    # Security headers
     Header always set X-Content-Type-Options nosniff
     Header always set X-Frame-Options DENY
     Header always set X-XSS-Protection "1; mode=block"
