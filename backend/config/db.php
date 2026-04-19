@@ -27,16 +27,17 @@ class Database {
 
     public function __construct() {
         $this->host     = getenv('DB_HOST') ?: '127.0.0.1';
-        $this->db_name  = getenv('DB_NAME') ?: 'knowledge_assessment';
+        $this->db_name  = getenv('DB_NAME') ?: 'test';
         $this->username = getenv('DB_USER') ?: 'root';
         $this->password = getenv('DB_PASS') ?: 'SAMskriti@0605';
     }
 
     public function getConnection() {
         $this->conn = null;
+        $port = getenv('DB_PORT') ?: '3306';
 
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $port . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->exec("set names utf8");
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
