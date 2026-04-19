@@ -22,6 +22,17 @@ switch($method) {
 
     case 'POST':
         if (!empty($data->assessment_id) && !empty($data->question_text) && !empty($data->correct_option)) {
+            // Check if assessment is diagnostic
+            $check = $db->prepare("SELECT is_diagnostic FROM assessments WHERE id = :id");
+            $check->execute([':id' => $data->assessment_id]);
+            $assessment = $check->fetch(PDO::FETCH_ASSOC);
+
+            if ($assessment && $assessment['is_diagnostic'] == 1) {
+                http_response_code(403);
+                echo json_encode(array("message" => "Cannot add questions to a mandatory diagnostic assessment."));
+                break;
+            }
+
             $query = "INSERT INTO questions SET assessment_id=:assessment_id, question_text=:question_text, option_a=:option_a, option_b=:option_b, option_c=:option_c, option_d=:option_d, correct_option=:correct_option, marks=:marks";
             $stmt = $db->prepare($query);
             
@@ -48,6 +59,17 @@ switch($method) {
 
     case 'DELETE':
         if (isset($_GET['id'])) {
+            // Get assessment_id first
+            $check = $db->prepare("SELECT a.is_diagnostic FROM assessments a JOIN questions q ON a.id = q.assessment_id WHERE q.id = :id");
+            $check->execute([':id' => $_GET['id']]);
+            $assessment = $check->fetch(PDO::FETCH_ASSOC);
+
+            if ($assessment && $assessment['is_diagnostic'] == 1) {
+                http_response_code(403);
+                echo json_encode(array("message" => "Cannot delete questions from a mandatory diagnostic assessment."));
+                break;
+            }
+
             $query = "DELETE FROM questions WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(":id", $_GET['id']);

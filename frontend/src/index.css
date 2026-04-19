@@ -7,6 +7,15 @@
   /* Slate Gray */
   --background: #f1f5f9;
   /* Light Gray Background */
+  --primary-light: rgba(128, 128, 0, 0.1);
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.1);
+  --success: #22c55e;
+  --success-light: rgba(34, 197, 94, 0.1);
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  --info: #0ea5e9;
+  --info-light: rgba(14, 165, 233, 0.1);
   --card-bg: #ffffff;
   --text-main: #1e293b;
   --text-muted: #64748b;
@@ -17,11 +26,18 @@
 }
 
 [data-theme="dark"] {
-  --background: #0f172a;
+  --background: #020617;
   --card-bg: #1e293b;
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  /* Brighter for dark mode */
   --border: #334155;
+  --card-hover: #334155;
+  --primary-light: rgba(128, 128, 0, 0.2);
+  --danger-light: rgba(239, 68, 68, 0.2);
+  --success-light: rgba(34, 197, 94, 0.2);
+  --warning-light: rgba(245, 158, 11, 0.2);
+  --info-light: rgba(14, 165, 233, 0.2);
 }
 
 body {

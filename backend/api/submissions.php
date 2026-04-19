@@ -10,7 +10,10 @@ $data = json_decode(file_get_contents("php://input"));
 
 if ($method == 'POST') {
     // Submit assessment
-    if (!empty($data->user_id) && !empty($data->assessment_id) && !empty($data->answers)) {
+    if (!empty($data->user_id) && !empty($data->assessment_id)) {
+        // Handle case where $data->answers is empty or missing
+        $answers_submitted = !empty($data->answers) && is_array($data->answers) ? $data->answers : array();
+        
         // Calculate score
         $total_score = 0;
         $total_marks = 0;
@@ -27,14 +30,22 @@ if ($method == 'POST') {
             $total_marks += $question['marks'];
             
             // Check if user answered this question
-            foreach($data->answers as $answer) {
-                if ($answer->question_id == $qid && $answer->selected_option == $question['correct_option']) {
+            foreach($answers_submitted as $answer) {
+                if (isset($answer->question_id) && $answer->question_id == $qid && 
+                    isset($answer->selected_option) && $answer->selected_option == $question['correct_option']) {
                    $total_score += $question['marks'];
                    break;
                 }
             }
         }
         
+        // If no questions found, we can't submit meaningfully
+        if ($total_marks == 0) {
+            http_response_code(400);
+            echo json_encode(array("message" => "This assessment has no questions."));
+            exit;
+        }
+
         // Save submission
         $query = "INSERT INTO submissions SET user_id=:user_id, assessment_id=:assessment_id, score=:score, total_marks=:total_marks";
         $stmt = $db->prepare($query);
@@ -46,14 +57,17 @@ if ($method == 'POST') {
         if ($stmt->execute()) {
             http_response_code(201);
             echo json_encode(array(
-                "message" => "Assessment submitted.",
+                "message" => "Assessment submitted successfully.",
                 "score" => $total_score,
                 "total_marks" => $total_marks
             ));
         } else {
-            http_response_code(503);
-            echo json_encode(array("message" => "Unable to submit assessment."));
+            http_response_code(500);
+            echo json_encode(array("message" => "Database error: Could not save submission."));
         }
+    } else {
+        http_response_code(400);
+        echo json_encode(array("message" => "Missing required data: user_id or assessment_id."));
     }
 } elseif ($method == 'GET') {
     if (isset($_GET['user_id']) && isset($_GET['assessment_id'])) {
@@ -66,7 +80,7 @@ if ($method == 'POST') {
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     } elseif (isset($_GET['user_id'])) {
         // Get submissions for a student (all assessments)
-        $query = "SELECT s.*, a.title as assessment_title FROM submissions s JOIN assessments a ON s.assessment_id = a.id WHERE s.user_id = :user_id ORDER BY s.submitted_at DESC";
+        $query = "SELECT s.*, a.title as assessment_title, a.category, a.is_diagnostic FROM submissions s JOIN assessments a ON s.assessment_id = a.id WHERE s.user_id = :user_id ORDER BY s.submitted_at DESC";
         $stmt = $db->prepare($query);
         $stmt->bindParam(":user_id", $_GET['user_id']);
         $stmt->execute();

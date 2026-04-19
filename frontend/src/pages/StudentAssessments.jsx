@@ -45,22 +45,22 @@ const StudentAssessments = () => {
                             <div key={assessment.id} className="card shadow-sm" style={{ borderTop: '4px solid var(--primary)' }}>
                                 <div className="flex justify-between items-start mb-4">
                                     <h4 style={{ margin: 0, fontSize: '1.25rem' }}>{assessment.title}</h4>
-                                    <span className="badge" style={{ background: '#f1f5f9', color: '#475569', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                                    <span className="badge" style={{ background: 'var(--background)', color: 'var(--text-main)', padding: '0.25rem 0.5rem', fontSize: '0.75rem', border: '1px solid var(--border)' }}>
                                         {assessment.duration_minutes} mins
                                     </span>
                                 </div>
                                 <p className="text-muted" style={{ fontSize: '0.9rem', minHeight: '3rem' }}>{assessment.description}</p>
 
-                                <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9' }}>
+                                <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
                                     {alreadyTaken ? (
                                         <div className="flex justify-between items-center">
-                                            <div style={{ color: '#808000', fontWeight: '700' }}>
+                                            <div style={{ color: 'var(--primary)', fontWeight: '700' }}>
                                                 Score: <span style={{ fontSize: '1.25rem' }}>{result.score}</span> / {result.total_marks}
                                             </div>
                                             <span className="text-muted" style={{ fontSize: '0.9rem' }}>✓ Completed</span>
                                         </div>
                                     ) : (
-                                        <Link to={`/take-test/${assessment.id}`} className="btn btn-primary w-full" style={{ textAlign: 'center', background: '#808000', borderColor: '#808000' }}>
+                                        <Link to={`/take-test/${assessment.id}`} className="btn btn-primary w-full" style={{ textAlign: 'center' }}>
                                             Take Assessment →
                                         </Link>
                                     )}

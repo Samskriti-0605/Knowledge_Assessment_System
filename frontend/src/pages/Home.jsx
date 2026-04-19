@@ -123,11 +123,11 @@ const Home = () => {
                         </thead>
                         <tbody>
                             {classmates.map((c, idx) => (
-                                <tr key={idx} style={{ background: c.id === user.id ? 'rgba(128, 128, 0, 0.1)' : 'var(--background)' }}>
-                                    <td style={{ padding: '1rem', borderRadius: '0.5rem 0 0 0.5rem', fontWeight: '700', fontSize: '1rem', border: 'none', color: 'var(--text-main)' }}>
+                                <tr key={idx} style={{ background: c.id === user.id ? 'var(--primary-light)' : 'transparent' }}>
+                                    <td style={{ padding: '1rem', borderRadius: '0.5rem 0 0 0.5rem', fontWeight: '700', fontSize: '1rem', borderBottom: '1px solid var(--border)', color: 'var(--text-main)' }}>
                                         {c.name} {c.id === user.id && <span style={{ color: 'var(--primary)', fontSize: '0.75rem' }}>(You)</span>}
                                     </td>
-                                    <td style={{ padding: '1rem', borderRadius: '0 0.5rem 0.5rem 0', textAlign: 'right', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)', border: 'none' }}>
+                                    <td style={{ padding: '1rem', borderRadius: '0 0.5rem 0.5rem 0', textAlign: 'right', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)', borderBottom: '1px solid var(--border)' }}>
                                         {c.roll_number || 'N/A'}
                                     </td>
                                 </tr>

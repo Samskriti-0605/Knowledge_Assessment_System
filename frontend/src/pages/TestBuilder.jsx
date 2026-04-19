@@ -1,20 +1,23 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const TestBuilder = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+    const { id } = useParams();
     const [title, setTitle] = useState('');
+    const [category, setCategory] = useState('General Knowledge');
     const [description, setDescription] = useState('');
     const [duration, setDuration] = useState(30);
     const [className, setClassName] = useState('');
     const [section, setSection] = useState('');
-    const [step, setStep] = useState(1); // 1: Assessment Info, 2: Add Questions
+    const [step, setStep] = useState(1); 
     const [assessmentId, setAssessmentId] = useState(null);
+    const [isReadOnly, setIsReadOnly] = useState(false);
+    const [questions, setQuestions] = useState([]);
 
-    // Question State
     const [questionText, setQuestionText] = useState('');
     const [optionA, setOptionA] = useState('');
     const [optionB, setOptionB] = useState('');
@@ -22,13 +25,43 @@ const TestBuilder = () => {
     const [optionD, setOptionD] = useState('');
     const [correctOption, setCorrectOption] = useState('A');
     const [marks, setMarks] = useState(1);
-    const [questions, setQuestions] = useState([]);
+
+    useEffect(() => {
+        if (id) {
+            fetchAssessment(id);
+        }
+    }, [id]);
+
+    const fetchAssessment = async (id) => {
+        try {
+            const response = await api.get(`assessments.php?id=${id}`);
+            const data = response.data;
+            setTitle(data.title);
+            setCategory(data.category);
+            setDescription(data.description);
+            setDuration(data.duration_minutes);
+            setClassName(data.class_name);
+            setSection(data.section);
+            setAssessmentId(data.id);
+            setStep(2); // Jump to questions for existing tests
+            setIsReadOnly(data.is_diagnostic == 1);
+            
+            // Fetch existing questions
+            const qResp = await api.get(`questions.php?assessment_id=${id}`);
+            setQuestions(qResp.data);
+        } catch (error) {
+            console.error('Error fetching assessment', error);
+        }
+    };
+
+    const categories = ['Mathematics', 'Science', 'English', 'Logic', 'General Knowledge'];
 
     const handleCreateAssessment = async (e) => {
         e.preventDefault();
         try {
             const response = await api.post('assessments.php', {
                 title,
+                category,
                 description,
                 created_by: user.id,
                 duration_minutes: duration,
@@ -86,6 +119,11 @@ const TestBuilder = () => {
         <div className="container" style={{ maxWidth: '800px' }}>
             <div className="flex justify-between items-center mb-4">
                 <h2>{step === 1 ? 'Step 1: Assessment Info' : 'Step 2: Add Questions'}</h2>
+                {isReadOnly && (
+                    <div className="badge" style={{ background: 'var(--warning-light)', color: 'var(--warning)', border: '1px solid var(--warning)', padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                        🛡️ PROTECTED ASSESSMENT (READ ONLY)
+                    </div>
+                )}
                 {assessmentId && <span className="text-muted">ID: {assessmentId}</span>}
             </div>
 
@@ -102,6 +140,18 @@ const TestBuilder = () => {
                                 onChange={e => setTitle(e.target.value)}
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label>Subject Category (For Skill Map Mapping)</label>
+                            <select 
+                                className="select" 
+                                value={category} 
+                                onChange={e => setCategory(e.target.value)}
+                            >
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="form-group">
                             <label>Description</label>
@@ -150,56 +200,60 @@ const TestBuilder = () => {
                     </div>
 
                     <div className="card mb-4">
-                        <h3>Add New Question</h3>
-                        <form onSubmit={handleAddQuestion}>
-                            <div className="form-group">
-                                <label>Question Text</label>
-                                <textarea
-                                    className="textarea"
-                                    value={questionText}
-                                    onChange={e => setQuestionText(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <h3>{isReadOnly ? 'Existing Questions' : 'Add New Question'}</h3>
+                        {!isReadOnly ? (
+                            <form onSubmit={handleAddQuestion}>
                                 <div className="form-group">
-                                    <label>Option A</label>
-                                    <input type="text" className="input" value={optionA} onChange={e => setOptionA(e.target.value)} required />
+                                    <label>Question Text</label>
+                                    <textarea
+                                        className="textarea"
+                                        value={questionText}
+                                        onChange={e => setQuestionText(e.target.value)}
+                                        required
+                                    />
                                 </div>
-                                <div className="form-group">
-                                    <label>Option B</label>
-                                    <input type="text" className="input" value={optionB} onChange={e => setOptionB(e.target.value)} required />
+                                <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="form-group">
+                                        <label>Option A</label>
+                                        <input type="text" className="input" value={optionA} onChange={e => setOptionA(e.target.value)} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Option B</label>
+                                        <input type="text" className="input" value={optionB} onChange={e => setOptionB(e.target.value)} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Option C</label>
+                                        <input type="text" className="input" value={optionC} onChange={e => setOptionC(e.target.value)} required />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Option D</label>
+                                        <input type="text" className="input" value={optionD} onChange={e => setOptionD(e.target.value)} required />
+                                    </div>
                                 </div>
-                                <div className="form-group">
-                                    <label>Option C</label>
-                                    <input type="text" className="input" value={optionC} onChange={e => setOptionC(e.target.value)} required />
+                                <div className="grid mt-4" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="form-group">
+                                        <label>Correct Option</label>
+                                        <select className="select" value={correctOption} onChange={e => setCorrectOption(e.target.value)}>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Marks</label>
+                                        <input type="number" className="input" value={marks} onChange={e => setMarks(e.target.value)} required />
+                                    </div>
                                 </div>
-                                <div className="form-group">
-                                    <label>Option D</label>
-                                    <input type="text" className="input" value={optionD} onChange={e => setOptionD(e.target.value)} required />
-                                </div>
-                            </div>
-                            <div className="grid mt-4" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div className="form-group">
-                                    <label>Correct Option</label>
-                                    <select className="select" value={correctOption} onChange={e => setCorrectOption(e.target.value)}>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                        <option value="D">D</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Marks</label>
-                                    <input type="number" className="input" value={marks} onChange={e => setMarks(e.target.value)} required />
-                                </div>
-                            </div>
-                            <button type="submit" className="btn btn-outline" style={{ width: '100%' }}>Add Question</button>
-                        </form>
+                                <button type="submit" className="btn btn-outline" style={{ width: '100%' }}>Add Question</button>
+                            </form>
+                        ) : (
+                            <p className="text-muted">Questions for diagnostic assessments are managed by the administrator and cannot be modified.</p>
+                        )}
                     </div>
 
                     <div className="card mb-4">
-                        <h3 className="mb-4">Questions Added ({questions.length})</h3>
+                        <h3 className="mb-4">Questions List ({questions.length})</h3>
                         <div className="table-responsive">
                             <table className="table">
                                 <thead>
@@ -223,7 +277,7 @@ const TestBuilder = () => {
                     </div>
 
                     <button onClick={handleFinish} className="btn btn-primary" style={{ width: '100%', padding: '1rem' }}>
-                        Finish & Save Assessment
+                        {isReadOnly ? 'Back to Dashboard' : 'Finish & Save Assessment'}
                     </button>
                 </div>
             )}

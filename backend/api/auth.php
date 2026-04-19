@@ -11,13 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'OPTIO
 
         if ($action == 'register') {
             if (!empty($data['name']) && !empty($data['email']) && !empty($data['password'])) {
-                $query = "INSERT INTO users (name, email, password_hash, role, class_name, section, streak_count, last_login) 
-                          VALUES (:name, :email, :password, :role, :class, :section, 0, NULL)";
+                $query = "INSERT INTO users (name, email, password_hash, role, class_name, section, roll_number, subject, phone_number, streak_count, last_login) 
+                          VALUES (:name, :email, :password, :role, :class, :section, :roll, :subject, :phone, 0, NULL)";
                 $stmt = $db->prepare($query);
                 
                 $role = $data['role'] ?? 'student';
-                $class = $data['class_name'] ?? null;
-                $section = $data['section'] ?? null;
+                $class = isset($data['class_name']) ? trim($data['class_name']) : null;
+                $section = isset($data['section']) ? trim($data['section']) : null;
+                $roll = isset($data['roll_number']) ? trim($data['roll_number']) : null;
+                $subject = $data['subject'] ?? null;
+                $phone = $data['phone_number'] ?? null;
                 $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
 
                 $stmt->bindParam(':name', $data['name']);
@@ -26,6 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'OPTIO
                 $stmt->bindParam(':role', $role);
                 $stmt->bindParam(':class', $class);
                 $stmt->bindParam(':section', $section);
+                $stmt->bindParam(':roll', $roll);
+                $stmt->bindParam(':subject', $subject);
+                $stmt->bindParam(':phone', $phone);
 
                 if ($stmt->execute()) {
                     http_response_code(201);

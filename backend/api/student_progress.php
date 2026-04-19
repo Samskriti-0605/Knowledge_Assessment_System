@@ -6,7 +6,7 @@ $db = $database->getConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Search student by roll number
-    $roll_number = isset($_GET['roll_number']) ? $_GET['roll_number'] : null;
+    $roll_number = isset($_GET['roll_number']) ? trim($_GET['roll_number']) : null;
     
     if ($roll_number) {
         // Get student details
@@ -42,8 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $avgScore = round($totalPercentage / $totalTests, 2);
             }
             
+            // Get student's class teacher details
+            $query = "SELECT name, email FROM users WHERE class_name = :class_name AND section = :section AND role = 'teacher' LIMIT 1";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(":class_name", $student['class_name']);
+            $stmt->bindParam(":section", $student['section']);
+            $stmt->execute();
+            $teacher = $stmt->fetch(PDO::FETCH_ASSOC);
+
             echo json_encode(array(
                 "student" => $student,
+                "teacher" => $teacher ? $teacher : array("name" => "Not Assigned", "email" => "N/A"),
                 "submissions" => $submissions,
                 "statistics" => array(
                     "total_tests" => $totalTests,

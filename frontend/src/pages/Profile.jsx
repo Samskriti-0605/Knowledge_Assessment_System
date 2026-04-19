@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import html2pdf from 'html2pdf.js';
+import ProgressReport from '../components/ProgressReport';
 
 const Profile = () => {
     const { user, setUser, logout } = useAuth();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -20,6 +24,8 @@ const Profile = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [reportData, setReportData] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -151,7 +157,7 @@ const Profile = () => {
                         );
                     })}
                 </svg>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                     <span>First Test</span>
                     <span>Recent</span>
                 </div>
@@ -159,9 +165,68 @@ const Profile = () => {
         );
     };
 
+    const handleDownloadReport = async () => {
+        if (isDownloading) return;
+        setIsDownloading(true);
+
+        try {
+            // Fetch comprehensive report data
+            const response = await api.get(`student_progress.php?roll_number=${user.roll_number}`);
+            setReportData(response.data);
+
+            // Give it a moment to render the hidden component
+            setTimeout(() => {
+                const element = document.querySelector('#hidden-report .printable-report');
+                if (element) {
+                    const opt = {
+                        margin: [10, 10, 10, 10],
+                        filename: `Progress_Report_${user.name}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    html2pdf().set(opt).from(element).save().then(() => {
+                        setIsDownloading(false);
+                        setReportData(null);
+                    });
+                }
+            }, 800);
+        } catch (error) {
+            alert("Failed to generate report.");
+            setIsDownloading(false);
+        }
+    };
+
+    const handleDeleteRequest = async () => {
+        if (window.confirm("ARE YOU SURE? This will request the teacher to PERMANENTLY DELETE your account and all scores. This cannot be undone.")) {
+            try {
+                const response = await api.put('users.php', {
+                    id: user.id,
+                    action: 'request_deletion'
+                });
+                alert(response.data.message);
+                // Update local status
+                const updatedUser = { ...user, delete_requested: 1 };
+                setUser(updatedUser);
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+            } catch (error) {
+                alert("Could not send deletion request.");
+            }
+        }
+    };
+
     return (
         <div className="container" style={{ paddingBottom: '4rem' }}>
-            <div className="grid" style={{ gridTemplateColumns: '1fr 1.5fr', gap: '2rem', alignItems: 'start', marginTop: '2rem' }}>
+            <div className="flex justify-between items-center mb-2" style={{ marginTop: '2rem' }}>
+                <h2 style={{ margin: 0 }}>👤 My Profile</h2>
+                {user.delete_requested == 1 && (
+                    <div className="badge" style={{ background: 'var(--danger-light)', color: 'var(--danger)', border: '1px solid var(--danger)', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 'bold', borderRadius: '0.5rem' }}>
+                        ⏳ DELETION REQUEST PENDING
+                    </div>
+                )}
+            </div>
+            
+            <div className="grid" style={{ gridTemplateColumns: '1fr 1.5fr', gap: '2rem', alignItems: 'start' }}>
 
                 {/* Profile Information Card */}
                 <div className="card" style={{ textAlign: 'center', padding: '2rem', position: 'sticky', top: '2rem' }}>
@@ -230,17 +295,36 @@ const Profile = () => {
                         </div>
                     )}
 
-                    <button onClick={logout} className="btn w-100" style={{ width: '100%', background: 'var(--secondary)', color: 'white', fontWeight: 'bold' }}>
+                    <button onClick={logout} className="btn w-100" style={{ width: '100%', background: 'var(--secondary)', color: 'white', fontWeight: 'bold', marginBottom: '1rem' }}>
                         🚪 Logout Account
                     </button>
+
+                    {user.role === 'student' && (
+                        <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                            <button 
+                                onClick={handleDeleteRequest}
+                                disabled={user.delete_requested == 1}
+                                className="btn" 
+                                style={{ 
+                                    width: '100%', 
+                                    background: user.delete_requested == 1 ? 'var(--background)' : 'var(--danger-light)',
+                                    color: 'var(--danger)',
+                                    border: `1px solid ${user.delete_requested == 1 ? 'var(--border)' : 'var(--danger)'}`,
+                                    fontSize: '0.875rem'
+                                }}
+                            >
+                                {user.delete_requested == 1 ? 'Deletion Pending Approval' : '⚠️ Request Account Deletion'}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Edit Section & Charts */}
                 <div>
                     <div className="card mb-4">
                         <h3 className="mb-4">Personal Settings</h3>
-                        {message && <div style={{ padding: '1rem', background: '#dcfce7', color: '#166534', borderRadius: '0.5rem', marginBottom: '1rem' }}>{message}</div>}
-                        {error && <div style={{ padding: '1rem', background: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', marginBottom: '1rem' }}>{error}</div>}
+                        {message && <div style={{ padding: '1rem', background: 'var(--success-light)', color: 'var(--success)', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid var(--success)' }}>{message}</div>}
+                        {error && <div style={{ padding: '1rem', background: 'var(--danger-light)', color: 'var(--danger)', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid var(--danger)' }}>{error}</div>}
 
                         <form onSubmit={handleSubmit} className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                             <div className="form-group" style={{ gridColumn: 'span 2' }}>
@@ -293,13 +377,36 @@ const Profile = () => {
 
                     {user.role === 'student' && (
                         <div className="card">
-                            <h3 style={{ margin: 0 }}>Performance History</h3>
-                            <p className="text-muted">Track your improvement across different assessments.</p>
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <h3 style={{ margin: 0 }}>Performance History</h3>
+                                    <p className="text-muted" style={{ margin: 0 }}>Track your improvement across assessments.</p>
+                                </div>
+                                <button 
+                                    onClick={handleDownloadReport}
+                                    disabled={isDownloading}
+                                    className="btn btn-primary" 
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+                                >
+                                    {isDownloading ? '⏳ Generating...' : '📄 Download Progress Report'}
+                                </button>
+                            </div>
                             <PerformanceChart />
                         </div>
                     )}
                 </div>
 
+            </div>
+
+            {/* Hidden Report Container for PDF Generation */}
+            <div id="hidden-report" style={{ 
+                position: 'absolute', 
+                left: '-9999px', 
+                top: 0, 
+                width: '800px',
+                background: 'white'
+             }}>
+                {reportData && <ProgressReport studentData={reportData} />}
             </div>
         </div>
     );

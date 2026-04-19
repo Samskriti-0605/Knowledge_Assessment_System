@@ -50,9 +50,13 @@ const TeacherAssessments = () => {
                                 <small className="text-gray-500">Created: {new Date(assessment.created_at).toLocaleDateString()}</small>
                             </div>
                             <div className="flex gap-2">
-                                <Link to={`/edit-test/${assessment.id}`} className="btn btn-outline">Edit/Add Questions</Link>
+                                {assessment.is_diagnostic != 1 && (
+                                    <Link to={`/edit-test/${assessment.id}`} className="btn btn-outline">Edit/Add Questions</Link>
+                                )}
                                 <Link to={`/results/${assessment.id}`} className="btn btn-primary">Results</Link>
-                                <button onClick={() => handleDelete(assessment.id)} className="btn btn-outline" style={{ color: 'var(--secondary)', borderColor: 'var(--secondary)' }}>Delete</button>
+                                {assessment.is_diagnostic != 1 && (
+                                    <button onClick={() => handleDelete(assessment.id)} className="btn btn-outline" style={{ color: 'var(--secondary)', borderColor: 'var(--secondary)' }}>Delete</button>
+                                )}
                             </div>
                         </div>
                     ))

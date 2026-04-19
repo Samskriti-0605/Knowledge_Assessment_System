@@ -6,11 +6,13 @@ import { Link } from 'react-router-dom';
 const TeacherDashboard = () => {
     const [assessments, setAssessments] = useState([]);
     const [students, setStudents] = useState([]);
+    const [deleteRequests, setDeleteRequests] = useState([]);
     const { user } = useContext(AuthContext);
 
     useEffect(() => {
         fetchAssessments();
         fetchStudents();
+        fetchDeleteRequests();
     }, []);
 
     const fetchAssessments = async () => {
@@ -28,6 +30,38 @@ const TeacherDashboard = () => {
             setStudents(response.data);
         } catch (error) {
             console.error('Error fetching students', error);
+        }
+    };
+
+    const fetchDeleteRequests = async () => {
+        try {
+            const response = await api.get(`users.php?class_name=${user.class_name}&section=${user.section}&role=student&delete_requested=1`);
+            setDeleteRequests(response.data);
+        } catch (error) {
+            console.error('Error fetching delete requests', error);
+        }
+    };
+
+    const handleApproveDelete = async (studentId) => {
+        if (window.confirm("PERMANENTLY DELETE this account? This will remove all their test data and cannot be undone.")) {
+            try {
+                await api.delete(`users.php?id=${studentId}`);
+                alert("Account deleted.");
+                fetchDeleteRequests();
+                fetchStudents();
+            } catch (error) {
+                alert("Failed to delete account.");
+            }
+        }
+    };
+
+    const handleRejectDelete = async (studentId) => {
+        try {
+            await api.put(`users.php`, { id: studentId, action: 'reject_deletion' });
+            alert("Request rejected.");
+            fetchDeleteRequests();
+        } catch (error) {
+            alert("Failed to reject request.");
         }
     };
 
@@ -134,6 +168,84 @@ const TeacherDashboard = () => {
                 </div>
             )}
 
+
+            {/* Account Deletion Requests */}
+            {deleteRequests.length > 0 && (
+                <div className="card mb-4" style={{ border: '1px solid #dc2626', background: 'rgba(220, 38, 38, 0.05)' }}>
+                    <h3 className="mb-4" style={{ color: '#dc2626', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        ⚠️ Account Deletion Requests ({deleteRequests.length})
+                    </h3>
+                    <div className="table-responsive">
+                        <table className="table">
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                                    <th style={{ color: 'var(--text-main)' }}>Roll No</th>
+                                    <th style={{ color: 'var(--text-main)' }}>Student Name</th>
+                                    <th style={{ textAlign: 'right', color: 'var(--text-main)' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {deleteRequests.map((req) => (
+                                    <tr key={req.id}>
+                                        <td>{req.roll_number}</td>
+                                        <td><strong>{req.name}</strong></td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            <button 
+                                                onClick={() => handleApproveDelete(req.id)}
+                                                className="btn btn-primary" 
+                                                style={{ background: '#dc2626', borderColor: '#dc2626', marginRight: '0.5rem', fontSize: '0.75rem' }}
+                                            >
+                                                Approve Deletion
+                                            </button>
+                                            <button 
+                                                onClick={() => handleRejectDelete(req.id)}
+                                                className="btn btn-outline" 
+                                                style={{ fontSize: '0.75rem' }}
+                                            >
+                                                Keep Account
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {/* My Students List */}
+            {students.length > 0 && (
+                <div className="card mb-4" style={{ padding: '0' }}>
+                    <div style={{ padding: '2rem 2rem 0' }}>
+                        <h3 className="mb-4">📋 My Students</h3>
+                        <p className="text-muted mb-4">Students in your assigned class and section.</p>
+                    </div>
+                    <div className="table-responsive" style={{ padding: '0 2rem 2rem' }}>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th style={{ textAlign: 'right' }}>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {students.map((student) => (
+                                    <tr key={student.id}>
+                                        <td>{student.roll_number || 'N/A'}</td>
+                                        <td>{student.name}</td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            <Link to={`/student-progress?roll=${student.roll_number}`} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                📄 View & Export Report
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             <div className="card mb-4">
                 <h3 className="mb-4">Quick Actions</h3>
