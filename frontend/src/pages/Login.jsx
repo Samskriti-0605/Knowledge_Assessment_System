@@ -55,10 +55,6 @@ const Login = () => {
                         Don't have an account? <span onClick={() => navigate('/register')} style={{ color: 'var(--primary)', cursor: 'pointer' }}>Register</span>
                     </p>
                 </form>
-                <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', paddingTop: '1rem', opacity: 0.5 }}>
-                    System V2.0 - Production Ready<br />
-                    Connected to Render Cloud Securely
-                </div>
             </div>
         </div>
     );
