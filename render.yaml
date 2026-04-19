@@ -15,11 +15,3 @@ services:
       - key: DB_PASS
         sync: false
 
-  - type: static
-    name: knowledge-assessment-frontend
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://knowledge-assessment-backend.onrender.com/api

@@ -10,7 +10,7 @@ function handleCors() {
     header("Access-Control-Allow-Credentials: true");
 
     if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-        http_response_code(240); // Custom code to verify preflight in logs
+        http_response_code(204); // Standard "No Content" for successful preflight
         exit();
     }
 }
