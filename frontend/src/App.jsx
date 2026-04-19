@@ -27,6 +27,20 @@ const ProtectedRoute = ({ children, role }) => {
 };
 
 const App = () => {
+  // Pre-warm the Render backend on app start (Wake up from sleep)
+  React.useEffect(() => {
+    const preWarm = async () => {
+      try {
+        const response = await fetch('https://knowledge-assessment-backend.onrender.com/api/ping.php');
+        console.log('--- System V2.0 Pre-warm ---');
+        console.log('Backend Status:', response.ok ? 'ALIVE' : 'FAILED');
+      } catch (e) {
+        console.warn('Backend Pre-warm failed. Service might still be waking up.');
+      }
+    };
+    preWarm();
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>

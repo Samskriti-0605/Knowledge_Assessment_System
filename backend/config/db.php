@@ -1,12 +1,16 @@
 <?php
 // Function to handle CORS - MUST BE CALLED IMMEDIATELY
 function handleCors() {
-    header("Access-Control-Allow-Origin: *");
+    if (headers_sent()) return;
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+    header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Allow-Credentials: true");
 
     if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-        http_response_code(200);
+        http_response_code(240); // Custom code to verify preflight in logs
         exit();
     }
 }
