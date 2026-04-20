@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'OPTIO
                           VALUES (:name, :email, :password, :role, :class, :section, :roll, :subject, :phone, 0, NULL)";
                 $stmt = $db->prepare($query);
                 
-                $role = $data['role'] ?? 'student';
+                $role = isset($data['role']) ? strtolower(trim($data['role'])) : 'student';
                 $class = isset($data['class_name']) ? trim($data['class_name']) : null;
                 $section = isset($data['section']) ? trim($data['section']) : null;
                 $roll = isset($data['roll_number']) ? trim($data['roll_number']) : null;
