@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     sqlite3 \
     libpq-dev \
+    postgresql-client \
     zip \
     unzip \
     && docker-php-ext-install pdo pdo_mysql pdo_sqlite pdo_pgsql mysqli zip
