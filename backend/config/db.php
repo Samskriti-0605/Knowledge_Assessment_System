@@ -37,7 +37,13 @@ class Database {
         $port = getenv('DB_PORT') ?: '3306';
 
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $port . ";dbname=" . $this->db_name, $this->username, $this->password);
+            // Enable SSL for TiDB Cloud
+            $options = [
+                PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/cacert.pem',
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+            ];
+            
+            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $port . ";dbname=" . $this->db_name, $this->username, $this->password, $options);
             $this->conn->exec("set names utf8");
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
