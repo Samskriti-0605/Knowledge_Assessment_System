@@ -19,32 +19,20 @@ function handleCors() {
 handleCors();
 
 class Database {
-    private $host;
-    private $db_name;
-    private $username;
-    private $password;
     public $conn;
-
-    public function __construct() {
-        $this->host     = getenv('DB_HOST') ?: '127.0.0.1';
-        $this->db_name  = getenv('DB_NAME') ?: 'test';
-        $this->username = getenv('DB_USER') ?: 'root';
-        $this->password = getenv('DB_PASS') ?: 'SAMskriti@0605';
-    }
 
     public function getConnection() {
         $this->conn = null;
-        $port = getenv('DB_PORT') ?: '3306';
 
         try {
-            // Enable SSL for TiDB Cloud
-            $options = [
-                PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/cacert.pem',
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
-            ];
+            // Use SQLite and store the database file in the config folder
+            $db_path = __DIR__ . '/database.sqlite';
+            $this->conn = new PDO("sqlite:" . $db_path);
             
-            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $port . ";dbname=" . $this->db_name, $this->username, $this->password, $options);
-            $this->conn->exec("set names utf8");
+            // Enable foreign keys for SQLite
+            $this->conn->exec("PRAGMA foreign_keys = ON;");
+            
+            // Throw exceptions on errors
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
             http_response_code(500);

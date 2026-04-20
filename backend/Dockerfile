@@ -6,9 +6,11 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     libmariadb-dev \
+    libsqlite3-dev \
+    sqlite3 \
     zip \
     unzip \
-    && docker-php-ext-install pdo pdo_mysql mysqli zip
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite mysqli zip
 
 # Enable Apache mod_rewrite required for our .htaccess router rules
 RUN a2enmod rewrite
