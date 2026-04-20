@@ -74,7 +74,7 @@ foreach ($diagnostics as $diag) {
     // Check if already exists
     $check = $db->prepare("SELECT id FROM assessments WHERE title = ?");
     $check->execute([$diag['title']]);
-    if ($check->rowCount() > 0) {
+    if ($check->fetch()) {
         echo "Skipping {$diag['title']} (Already exists)\n";
         continue;
     }
