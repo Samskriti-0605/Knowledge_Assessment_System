@@ -1,7 +1,20 @@
 import axios from 'axios';
 
 // Professional API Configuration - Uses Vercel/Render Environment Variables
-const baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').trim();
+// Professional API Configuration - Handles Render hostnames and local development
+let rawURL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').trim();
+
+// If the URL is just a hostname (e.g. knowledge-backend.onrender.com), add https:// and /api
+if (!rawURL.startsWith('http')) {
+    rawURL = `https://${rawURL}`;
+}
+
+// Ensure it ends with /api for backend routing
+if (!rawURL.endsWith('/api') && !rawURL.includes('/api/')) {
+    rawURL = rawURL.endsWith('/') ? `${rawURL}api` : `${rawURL}/api`;
+}
+
+const baseURL = rawURL;
 
 console.log('API Connectivity:', {
     environment: import.meta.env.MODE,
