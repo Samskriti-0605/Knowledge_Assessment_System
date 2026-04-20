@@ -8,9 +8,10 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev \
     libsqlite3-dev \
     sqlite3 \
+    libpq-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo pdo_mysql pdo_sqlite mysqli zip
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite pdo_pgsql mysqli zip
 
 # Enable Apache mod_rewrite required for our .htaccess router rules
 RUN a2enmod rewrite

@@ -43,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'OPTIO
             }
         } elseif ($action == 'login') {
             if (!empty($data['email']) && !empty($data['password'])) {
-                $query = "SELECT * FROM users WHERE email = :email LIMIT 0,1";
+                $query = "SELECT * FROM users WHERE email = :email LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':email', $data['email']);
                 $stmt->execute();
 
-                if ($stmt->rowCount() > 0) {
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
                     if (password_verify($data['password'], $row['password_hash'])) {
                         
                         // Handle Streak

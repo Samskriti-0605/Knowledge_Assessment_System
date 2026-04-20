@@ -47,7 +47,7 @@ if ($method == 'POST') {
         }
 
         // Save submission
-        $query = "INSERT INTO submissions SET user_id=:user_id, assessment_id=:assessment_id, score=:score, total_marks=:total_marks";
+        $query = "INSERT INTO submissions (user_id, assessment_id, score, total_marks) VALUES (:user_id, :assessment_id, :score, :total_marks)";
         $stmt = $db->prepare($query);
         $stmt->bindParam(":user_id", $data->user_id);
         $stmt->bindParam(":assessment_id", $data->assessment_id);

@@ -33,7 +33,7 @@ switch($method) {
                 break;
             }
 
-            $query = "INSERT INTO questions SET assessment_id=:assessment_id, question_text=:question_text, option_a=:option_a, option_b=:option_b, option_c=:option_c, option_d=:option_d, correct_option=:correct_option, marks=:marks";
+            $query = "INSERT INTO questions (assessment_id, question_text, option_a, option_b, option_c, option_d, correct_option, marks) VALUES (:assessment_id, :question_text, :option_a, :option_b, :option_c, :option_d, :correct_option, :marks)";
             $stmt = $db->prepare($query);
             
             $marks = isset($data->marks) ? $data->marks : 1;

@@ -67,7 +67,7 @@ switch($method) {
     case 'POST':
         // Create assessment
         if (!empty($data->title) && !empty($data->created_by)) {
-            $query = "INSERT INTO assessments SET title=:title, description=:description, created_by=:created_by, duration_minutes=:duration_minutes, class_name=:class_name, section=:section, category=:category";
+            $query = "INSERT INTO assessments (title, description, created_by, duration_minutes, class_name, section, category) VALUES (:title, :description, :created_by, :duration_minutes, :class_name, :section, :category)";
             $stmt = $db->prepare($query);
             
             $desc = isset($data->description) ? $data->description : "";
