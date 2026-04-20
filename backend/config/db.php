@@ -58,8 +58,23 @@ class Database {
 
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Set PostgreSQL search path if needed (usually handled by connection)
-            
+            // --- AUTO-INITIALIZATION (Zero-Touch) ---
+            // If PostgreSQL, check if 'users' table exists. If not, initialize.
+            if ($db_url) {
+                $check = $this->conn->query("SELECT to_regclass('public.users')");
+                if ($check->fetchColumn() === null) {
+                    $sql_file = __DIR__ . '/../database_psql.sql';
+                    if (file_exists($sql_file)) {
+                        $this->conn->exec(file_get_contents($sql_file));
+                    }
+                }
+            } elseif (!$db_host) { 
+                // For SQLite: check if 'users' table exists 
+                $check = $this->conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
+                if (!$check->fetch()) {
+                    // Local SQLite initialization would happen here if needed
+                }
+            }
         } catch(PDOException $exception) {
             http_response_code(500);
             echo json_encode(array("message" => "Connection error: " . $exception->getMessage()));
